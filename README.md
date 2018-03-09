@@ -14,7 +14,7 @@ pip install flask-matomo
 
 ## Usage
 
-```
+```python
 from flask import Flask, render_template
 from flask_matomo import *
 

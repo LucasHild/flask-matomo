@@ -1,8 +1,8 @@
-"""
+from setuptools import setup
+
+long_description = """
 Flask-Matomo
 ============
-
-|image0| |PyPI| |PyPI|
 
 Flask-Matomo is a library which lets you track the requests of your
 Flask website using Matomo (Piwik).
@@ -53,14 +53,7 @@ Meta
   for details
 
 .. _`https://lucas-hild.de`: https://lucas.hild.de
-
-.. |image0| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
-.. |PyPI| image:: https://img.shields.io/pypi/v/flask-matomo.svg?style=flat-square&colorB=dfb317
-   :target: https://pypi.org/project/flask-matomo/
-.. |PyPI| image:: https://img.shields.io/badge/docs-readthedocs-red.svg?style=flat-square
-   :target:
 """
-from setuptools import setup
 
 setup(
     name="Flask-Matomo",
@@ -70,7 +63,7 @@ setup(
     author="Lucas Hild",
     author_email="contact@lucas-hild.de",
     description="Track requests to your Flask website with Matomo ",
-    long_description=__doc__,
+    long_description=long_description,
     packages=["flask_matomo"],
     zip_safe=False,
     include_package_data=True,
