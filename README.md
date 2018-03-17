@@ -2,7 +2,7 @@
 
 ![](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
 [![PyPI](https://img.shields.io/pypi/v/flask-matomo.svg?style=flat-square&colorB=dfb317)](https://pypi.org/project/flask-matomo/)
-[![PyPI](https://img.shields.io/badge/docs-readthedocs-red.svg?style=flat-square)]()
+[![Docs](https://img.shields.io/badge/docs-readthedocs-red.svg?style=flat-square)](https://flask-matomo.readthedocs.io)
 
 Flask-Matomo is a library which lets you track the requests of your Flask website using Matomo (Piwik).
 

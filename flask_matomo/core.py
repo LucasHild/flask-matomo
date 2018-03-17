@@ -1,6 +1,7 @@
 import requests
 
 from flask import current_app, request
+from functools import wraps
 from threading import Thread
 
 from . import MatomoError
@@ -28,6 +29,7 @@ class Matomo(object):
         self.id_site = id_site
         self.token_auth = token_auth
         self.base_url = base_url.strip("/") if base_url else base_url
+        self.ignored_routes = []
 
         if not matomo_url:
             raise ValueError("matomo_url has to be set")
@@ -42,6 +44,10 @@ class Matomo(object):
 
     def before_request(self):
         """Exectued before every request, parses details about request"""
+        # Don't track track request, if user used ignore() decorator for route
+        if request.endpoint in self.ignored_routes:
+            return
+
         if self.base_url:
             url = self.base_url + request.path
         else:
@@ -87,3 +93,25 @@ class Matomo(object):
 
         if r.status_code != 200:
             raise MatomoError(r.text)
+
+    def ignore(self):
+        """Ignore a route and don't track it
+
+        Args:
+            action_name (str): name of the site
+            url (str): url to track
+            user_agent (str): User-Agent of request
+            id (str): id of user
+            ip_address (str): ip address of request
+
+        Examples:
+            @app.route("/")
+            @matomo.ignore()
+            def index():
+                return jsonify({})
+        """
+        def wrap(f):
+            self.ignored_routes.append(f.__name__)
+            return f
+
+        return wrap
