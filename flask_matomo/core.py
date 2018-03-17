@@ -1,7 +1,6 @@
 import requests
 
 from flask import current_app, request
-from functools import wraps
 from threading import Thread
 
 from . import MatomoError
@@ -30,6 +29,7 @@ class Matomo(object):
         self.token_auth = token_auth
         self.base_url = base_url.strip("/") if base_url else base_url
         self.ignored_routes = []
+        self.routes_details = {}
 
         if not matomo_url:
             raise ValueError("matomo_url has to be set")
@@ -61,12 +61,20 @@ class Matomo(object):
         user_agent = request.user_agent
         ip_address = request.remote_addr
 
+        keyword_arguments = {
+            "action_name": action_name,
+            "url": url,
+            "user_agent": user_agent,
+            "ip_address": ip_address
+        }
+
+        # Overwrite action_name, if it was configured with config()
+        if self.routes_details.get(action_name) and self.routes_details.get(action_name).get("action_name"):
+            keyword_arguments["action_name"] = self.routes_details.get(
+                action_name).get("action_name")
+
         # Create new thread with request, because otherwise the original request will be blocked
-        Thread(target=self.track, kwargs={
-               "action_name": action_name,
-               "url": url,
-               "user_agent": user_agent,
-               "ip_address": ip_address}).start()
+        Thread(target=self.track, kwargs=keyword_arguments).start()
 
     def track(self, action_name, url, user_agent=None, id=None, ip_address=None):
         """Send request to Matomo
@@ -105,13 +113,33 @@ class Matomo(object):
             ip_address (str): ip address of request
 
         Examples:
-            @app.route("/")
+            @app.route("/admin")
             @matomo.ignore()
-            def index():
-                return jsonify({})
+            def admin():
+                return render_template("admin.html")
         """
         def wrap(f):
             self.ignored_routes.append(f.__name__)
+            return f
+
+        return wrap
+
+    def details(self, action_name=None):
+        """Set details like action_name for a route
+
+        Args:
+            action_name (str): name of the site
+
+        Examples:
+            @app.route("/users")
+            @matomo.details(action_name="Users")
+            def all_users():
+                return render_template("users.html")
+        """
+        def wrap(f):
+            self.routes_details[f.__name__] = {
+                "action_name": action_name
+            }
             return f
 
         return wrap
